@@ -1,25 +1,69 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.css'
+import { useState } from 'react'
+import React from 'react'
+import axios from 'axios'
 
-function App() {
+const CardList = (props) => (
+  <div>
+    {props.profiles.map((profile) => (
+      <Card key={profile.id} profile={profile} />
+    ))}
+  </div>
+)
+
+export const Card = (props) => {
+  const profile = props.profile
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='github-profile'>
+      <img  src={profile.avatar_url} />
+      <div className='info'>
+        <div className='name'>{profile.name}</div>
+        <div className='company'>I work for {profile.company ? profile.company : 'no one yet'}</div>
+        <div>{profile.bio}</div>
+      </div>
+      <hr></hr>
     </div>
-  );
+  )
 }
 
-export default App;
+export const Form = (props) => {
+  const [userName, setUserName] = useState('')
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const response = await axios.get(`https://api.github.com/users/${userName}`)
+    console.log(response.data)
+    props.onSubmit(response.data) // whatever function gets passed into the 'onSubmit' prop will take 'response.data' as an argument.
+    // and that's how we pass data to a parent from a child. The function is defined in the parent, and the argument is defined in the child.
+    setUserName('')
+  }
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type='text'
+        value={userName}
+        onChange={(event) => setUserName(event.target.value)}
+        placeholder='GitHub username'
+        required
+      />
+      <button>Add card</button>
+    </form>
+  )
+}
+
+export const App = () => {
+  const [profiles, setProfiles] = useState([])
+  const addNewProfile = (profileData) => {
+    setProfiles([...profiles, profileData])
+  }
+  return (
+    <div className='objects'>
+      <div className='header'>The GitHub Cards App</div>
+      <Form onSubmit={addNewProfile} />
+      <hr></hr>
+      <CardList profiles={profiles} />
+    </div>
+  )
+}
+
+
+export default App
