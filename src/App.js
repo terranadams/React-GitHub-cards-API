@@ -29,7 +29,7 @@ export const Card = (props) => {
 export const Form = (props) => {
   const [userName, setUserName] = useState('')
   const handleSubmit = async (event) => {
-    event.preventDefault() // makes it so the "form" isn't actually submitted. We use this when handling forms. 
+    event.preventDefault() // keeps the page from being refreshed by the form submission
     const response = await axios.get(`https://api.github.com/users/${userName}`)
     console.log(response.data)
     props.onSubmit(response.data) // whatever function gets passed into the 'onSubmit' prop will take 'response.data' as an argument.
